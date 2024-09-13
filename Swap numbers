@@ -1,10 +1,10 @@
 #include <iostream>
 
-#define CIN_SECURE				\
+#define CIN_SECURE			\
 if (std::cin.fail())			\
-{								\
-std::cin.clear();				\
-std::cin.ignore(32767, '\n');	\
+{					\
+std::cin.clear();			\
+std::cin.ignore(32767, '\n');		\
 }								
 
 void change(int* x, int* y)
