@@ -1,0 +1,62 @@
+#include <iostream>
+
+struct Students
+{
+	std::string name;
+	int grade;
+};
+
+void sortNames(Students* students, int length)
+{
+	for (int startIndex = 0; startIndex < length; ++startIndex)
+	{
+		int largestIndex = startIndex;
+		for (int currentIndex = startIndex + 1; currentIndex < length; ++currentIndex)
+		{
+			if (students[currentIndex].grade > students[largestIndex].grade)
+				largestIndex = currentIndex;
+		}
+		std::swap(students[startIndex], students[largestIndex]);
+	}
+}
+
+int main()
+{
+	int numStud{ 0 };
+	do 
+	{
+		std::cout << "How many students you want: ";
+		std::cin >> numStud;
+		if (std::cin.fail())
+		{
+			std::cin.clear();
+			std::cin.ignore(32767, '\n');
+		}
+	} while (numStud <= 1);
+
+	Students* StudentList = new Students[numStud];
+
+	for (int i = 0; i < numStud; i++)
+	{
+		std::cout << "Enter name #" << i + 1 << ' ';
+		std::cin >> StudentList[i].name;
+		if (std::cin.fail())
+		{
+			std::cin.clear();
+			std::cin.ignore(32767, '\n');
+		}
+		std::cout << "Enter grade #" << i + 1 << ' ';
+		std::cin >> StudentList[i].grade;
+		if (std::cin.fail())
+		{
+			std::cin.clear();
+			std::cin.ignore(32767, '\n');
+		}
+	}
+	sortNames(StudentList, numStud);
+	for (int i = 0; i < numStud; i++)
+	{
+		std::cout << StudentList[i].name << " has " << StudentList[i].grade << " grade\n";
+	}
+	return 0;
+}
