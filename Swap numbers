@@ -1,0 +1,41 @@
+#include <iostream>
+
+#define CIN_SECURE				\
+if (std::cin.fail())			\
+{								\
+std::cin.clear();				\
+std::cin.ignore(32767, '\n');	\
+}								
+
+void change(int* x, int* y)
+{
+	int temp = *x;
+	*x = *y;
+	*y = temp;
+}
+
+int main()
+{
+	int a{ 0 }, b{ 0 };
+	std::cout << "Enter first number: ";
+	std::cin >> a;
+	CIN_SECURE;
+	std::cout << "Enter second number: ";
+	std::cin >> b;
+	CIN_SECURE;
+	std::cout << "Your first number is (a): " << a << '\n';
+	std::cout << "Your second number is (b): " << b << '\n';
+	change(&a, &b);
+	std::cout << "Your first number is (a): " << a << '\n';
+	std::cout << "Your second number is (b): " << b << '\n';
+	return 0;
+}
+
+P.S. You can always write function like this:
+
+void change(int* x, int* y)
+{
+	std::swap(*x, *y);
+}
+
+The result will be the same ;)
