@@ -1,0 +1,114 @@
+#include <iostream>
+
+typedef int(*arifmeticFnc)(int, int);
+
+enum Opertators
+{
+	PLUS = '+',
+	MINUS = '-',
+	MULTIPLY = '*',
+	DELENIE = '/'
+};
+
+struct arithmeticStruct
+{
+	char op;
+	arifmeticFnc func;
+};
+
+int getInteger()
+{
+	do
+	{
+		int x{ 0 };
+		std::cout << "Write first number: ";
+		std::cin >> x;
+		if (std::cin.fail())
+		{
+			std::cin.clear();
+			std::cin.ignore(32767, '\n');
+			std::cout << "Incorrect input, try again!" << '\n';
+		}
+		else
+		{
+			std::cin.ignore(32767, '\n');
+			return x;
+		}
+	} while (true);
+}
+
+int cinOperatorCheck(char oper)
+{
+	if (PLUS == oper || MINUS == oper || MULTIPLY == oper || DELENIE == oper)
+	{
+		return 0;
+	}
+	else
+	{
+		return 1;
+	}
+}
+
+char getOperation()
+{
+	do
+	{
+		char x{ 0 };
+		std::cout << "Choose operation + - * /: ";
+		std::cin >> x;
+		if (std::cin.fail() || cinOperatorCheck(x))
+		{
+			std::cin.clear();
+			std::cin.ignore(32767, '\n');
+			std::cout << "Incorrect input, try again!" << '\n';
+		}
+		else
+		{
+			std::cin.ignore(32767, '\n');
+			return x;
+		}
+	} while (true);
+}
+
+namespace doMath {
+	int add(int x, int y)
+	{
+		return x + y;
+	}
+	int substract(int x, int y)
+	{
+		return x - y;
+	}
+	int multiply(int x, int y)
+	{
+		return x * y;
+	}
+	int divide(int x, int y)
+	{
+		return x / y;
+	}
+}
+
+static arithmeticStruct arithmeticArray[]{
+	{'+', doMath::add },
+	{'-', doMath::substract},
+	{'*', doMath::multiply},
+	{'/', doMath::divide}
+};
+
+arifmeticFnc getArifmeticFnc(char x)
+{
+	for (int i = 0; i < std::size(arithmeticArray); i++)
+		if (arithmeticArray[i].op == x)
+			return arithmeticArray[i].func;
+}
+
+int main()
+{
+	int a{ getInteger() };
+	char b{ getOperation() };
+	int c{ getInteger() };
+	arifmeticFnc function = getArifmeticFnc(b);
+	std::cout << function(a,c) << std::endl;
+	return 0;
+}
