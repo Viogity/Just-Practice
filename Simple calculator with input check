@@ -1,0 +1,85 @@
+#include <iostream>
+
+enum Opertators
+{
+	PLUS = '+',
+	MINUS = '-',
+	MULTIPLY = '*',
+	DELENIE = '/',
+	MAX_SIZE = 4
+};
+
+int getInteger()
+{
+	do
+	{
+		int x{ 0 };
+		std::cout << "Write first number: ";
+		std::cin >> x;
+		if (std::cin.fail())
+		{
+			std::cin.clear();
+			std::cin.ignore(32767, '\n');
+			std::cout << "Incorrect input, try again!" << '\n';
+		}
+		else
+		{
+			std::cin.ignore(32767, '\n');
+			return x;
+		}
+	} while (true);
+}
+
+int cinOperatorCheck(char oper)
+{
+	if (PLUS == oper || MINUS == oper || MULTIPLY == oper || DELENIE == oper)
+	{
+		return 0;
+	}
+	else
+	{
+		return 1;
+	}
+}
+
+char getOperation()
+{
+	do
+	{
+		char x{ 0 };
+		std::cout << "Choose operation + - * /: ";
+		std::cin >> x;
+		if (std::cin.fail() || cinOperatorCheck(x))
+		{
+			std::cin.clear();
+			std::cin.ignore(32767, '\n');
+			std::cout << "Incorrect input, try again!" << '\n';
+		}
+		else
+		{
+			std::cin.ignore(32767, '\n');
+			return x;
+		}
+	} while (true);
+}
+
+void doMath(int first, char oper, int second)
+{
+	std::cout << "Result of your actions is = ";
+	switch (oper)
+	{
+	case PLUS:		std::cout << first + second << std::endl; break;
+	case MINUS:		std::cout << first - second << std::endl; break;
+	case MULTIPLY:	std::cout << first * second << std::endl; break;
+	case DELENIE:	std::cout << first / second << std::endl; break;
+	}
+}
+
+int main()
+{
+	int a{ getInteger() };
+	char b{getOperation()};
+	int c{ getInteger() };
+	doMath(a, b, c);
+	return 0;
+}
