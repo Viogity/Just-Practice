@@ -1,0 +1,401 @@
+#include "Employers.h"
+#include "Database.h"
+
+using namespace Records;
+
+int displayMenu();
+void doHire(Database& db);
+void doFire(Database& db);
+void doPromote(Database& db);
+
+int main(int argc, char* argv[])
+{
+	Database employeeDB;
+	bool done{ false };
+	while (!done) {
+		int selection{ displayMenu() };
+		switch (selection) {
+		case 0:
+			done = true;
+			break;
+		case 1:
+			doHire(employeeDB);
+			break;
+		case 2:
+			doFire(employeeDB);
+			break;
+		case 3:
+			doPromote(employeeDB);
+			break;
+		case 4:
+			employeeDB.displayAll();
+			break;
+		case 5:
+			employeeDB.displayCurrent();
+			break;
+		case 6:
+			employeeDB.displayFormer();
+			break;
+		default:
+			std::cerr << "Unknown command." << std::endl;
+			break;
+		}
+	}
+
+	return 0;
+}
+
+int displayMenu()
+{
+	int selection;
+	std::cout << std::endl;
+	std::cout << "Employee Database" << std::endl;
+	std::cout << "-----------------" << std::endl;
+	std::cout << "1) Hire a new employee" << std::endl;
+	std::cout << "2) Fire an employee" << std::endl;
+	std::cout << "3) Promote an employee" << std::endl;
+	std::cout << "4) List all employees" << std::endl;
+	std::cout << "5) List all current employees" << std::endl;
+	std::cout << "6) List all former employees" << std::endl;
+	std::cout << "0) Quit" << std::endl;
+	std::cout << std::endl;
+	do
+	{
+		std::cout << "---> ";
+		std::cin >> selection;
+		std::cout << std::endl;
+		if (std::cin.fail())
+		{
+			std::cin.clear();
+			std::cin.ignore(32767, '\n');
+			std::cout << "Invalid input, choose again" << std::endl;
+		}
+		else
+		{
+			return selection;
+		}
+	} while (true);
+}
+
+void doHire(Database& db)
+{
+	std::string firstName;
+	std::string lastName;
+	std::cout << "First name? ";
+	std::cin >> firstName;
+	std::cout << " Last name? ";
+	std::cin >> lastName;
+	auto& employee{ db.addEmployee(firstName, lastName) };
+	std::cout << std::format("Hired employee {} {} with employee number {}.",
+		firstName, lastName, employee.getEmployeeNumber()) << std::endl;
+}
+
+void doFire(Database& db)
+{
+	int employeeNumber;
+	std::cout << "Employee number? ";
+	std::cin >> employeeNumber;
+	try {
+		auto& emp{ db.getEmployee(employeeNumber) };
+		emp.fire();
+		std::cout << std::format("Employee {} terminated.", employeeNumber) << std::endl;
+	}
+	catch (const std::logic_error& exception) {
+		std::cerr << std::format("Unable to terminate employee: {}",
+			exception.what()) << std::endl;
+	}
+}
+
+void doPromote(Database& db)
+{
+	int employeeNumber;
+	std::cout << "Employee number? ";
+	std::cin >> employeeNumber;
+	int raiseAmount;
+	std::cout << "How much of a raise? ";
+	std::cin >> raiseAmount;
+	try {
+		auto& emp{ db.getEmployee(employeeNumber) };
+		emp.promote(raiseAmount);
+	}
+	catch (const std::logic_error& exception) {
+		std::cerr << std::format("Unable to promote employee: {}", exception.what()) << std::endl;
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#pragma once
+
+#include <string>
+#include <iostream>
+#include <format>
+
+#ifndef EMPLOYERS
+#define EMPLOYERS
+
+namespace Records
+{
+	const int DefaultStartingSalary{ 30'000 };
+	const int DefaultRaiseAndDemertingAmount{ 1'000 };
+
+	class Employer
+	{
+	public:
+		Employer(const std::string& firstName, const std::string& lastName);
+		~Employer();
+
+		void promote(int raiseAmount = DefaultRaiseAndDemertingAmount);
+		void demote(int demeritAmount = DefaultRaiseAndDemertingAmount);
+		void hire(); // Hires or rehires the employee
+		void fire(); // Dismisses the employee
+		void display() const;// Outputs employee info to console
+
+		// Getters and setters
+		void setFirstName(const std::string& firstName);
+		const std::string& getFirstName() const;
+
+		void setLastName(const std::string& lastName);
+		const std::string& getLastName() const;
+
+		void setEmployeeNumber(int employeeNumber);
+		int getEmployeeNumber() const;
+
+		void setSalary(int newSalary);
+		int getSalary() const;
+
+		bool isHired() const;
+
+	private:
+		std::string m_firstName;
+		std::string m_lastName;
+		int m_employeeNumber{ -1 };
+		int m_salary{ DefaultStartingSalary };
+		bool m_hired{ false };
+	};
+};
+
+#endif // !EMPLOYERS
+
+
+
+
+
+
+
+
+
+
+
+
+
+#include "Employers.h"
+
+namespace Records {
+	Employer::Employer(const std::string& firstName, const std::string& lastName) 
+		: m_firstName{ firstName }, m_lastName{ lastName }
+	{
+	}
+
+	Employer::~Employer() 
+	{
+	}
+
+	void Employer::promote(int raiseAmount)
+	{
+		setSalary(getSalary() + raiseAmount);
+	}
+	void Employer::demote(int demeritAmount)
+	{
+		setSalary(getSalary() - demeritAmount);
+	}
+
+	void Employer::hire() { m_hired = true; }
+	void Employer::fire() { m_hired = false; }
+
+	void Employer::display() const
+	{
+		std::cout << std::format("Employee: {}, {}", getLastName(), getFirstName()) << std::endl;
+		std::cout << "-------------------------" << std::endl;
+		std::cout << (isHired() ? "Current Employee" : "Former Employee") << std::endl;
+		std::cout << std::format("Employee Number: {}", getEmployeeNumber()) << std::endl;
+		std::cout << std::format("Salary: ${}", getSalary()) << std::endl;
+		std::cout << std::endl;
+	}
+
+	// Getters and setters
+	void Employer::setFirstName(const std::string& firstName)
+	{
+		m_firstName = firstName;
+	}
+	const std::string& Employer::getFirstName() const
+	{
+		return m_firstName;
+	}
+
+	void Employer::setLastName(const std::string& lastName)
+	{
+		m_lastName = lastName;
+	}
+	const std::string& Employer::getLastName() const
+	{
+		return m_lastName;
+	}
+
+	void Employer::setEmployeeNumber(int employeeNumber)
+	{
+		m_employeeNumber = employeeNumber;
+	}
+	int Employer::getEmployeeNumber() const
+	{
+		return m_employeeNumber;
+	}
+
+	void Employer::setSalary(int newSalary)
+	{
+		m_salary = newSalary;
+	}
+	int Employer::getSalary() const
+	{
+		return m_salary;
+	}
+
+	bool Employer::isHired() const
+	{
+		return m_hired ? true : false;
+	}
+
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+#pragma once
+
+#include <vector>
+#include <iostream>
+#include <string>
+#include <stdexcept>
+#include "Employers.h"
+
+#ifndef DATABASE
+#define DATABASE
+
+namespace Records
+{
+	class Database
+	{
+	public:
+		Database() {};
+		~Database() {};
+
+		Employer& addEmployee(const std::string& firstName,
+			const std::string& lastName);
+		Employer& getEmployee(int employeeNumber);
+		Employer& getEmployee(const std::string& firstName,
+			const std::string& lastName);
+
+		void displayAll() const;
+		void displayCurrent() const;
+		void displayFormer() const;
+
+	private:
+		std::vector<Employer> m_employers;
+		int FirstEmployerNumber {0};
+		int m_nextEmployeeNumber{ FirstEmployerNumber };
+	};
+}
+
+#endif // !DATABASE
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#include "Database.h"
+
+namespace Records
+{
+	Employer& Database::addEmployee(const std::string& firstName,
+		const std::string& lastName)
+	{
+		Employer theEmployee{ firstName, lastName };
+		theEmployee.setEmployeeNumber(m_nextEmployeeNumber++);
+		theEmployee.hire();
+		m_employers.push_back(theEmployee);
+		return m_employers.back();
+	}
+
+	Employer& Database::getEmployee(int employeeNumber)
+	{
+		for (auto& employee : m_employers) {
+			if (employee.getEmployeeNumber() == employeeNumber) {
+				return employee;
+			}
+		}
+		throw std::logic_error{ "No employee found." };
+	}
+
+	Employer& Database::getEmployee(const std::string& firstName,
+		const std::string& lastName)
+	{
+		for (auto& employee : m_employers) {
+			if ((employee.getFirstName() == firstName) &&
+				(employee.getLastName() == lastName))
+			{
+				return employee;
+			}
+		}
+		throw std::logic_error{ "No employee found." };
+	}
+
+	void Database::displayAll() const
+	{
+		for (const auto& employee : m_employers) { employee.display(); }
+	}
+
+	void Database::displayCurrent() const
+	{
+		for (const auto& employee : m_employers) {
+			if (employee.isHired()) { employee.display(); }
+		}
+	}
+
+	void Database::displayFormer() const
+	{
+		for (const auto& employee : m_employers) {
+			if (!employee.isHired()) { employee.display(); }
+		}
+	}
+};
